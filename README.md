@@ -5,7 +5,7 @@ API do projeto **LudoLoca**, uma plataforma de aluguel de jogos de tabuleiro.
 Este repositório contém o backend construído com ASP.NET Core Web API, autenticação via Identity + JWT + OAuth (Google/GitHub), e banco de dados PostgreSQL com Entity Framework Core.
 
 ## Arquitetura
-por que? --> navegar até arquivo ARQUIVOS\decisoes.docx
+por que? --> navegar até arquivo Backend\ARQUIVOS\decisoes.docx
 
 | Camada         | Tecnologia                           | Justificativa                                                                  |
 |----------------|--------------------------------------|--------------------------------------------------------------------------------|
