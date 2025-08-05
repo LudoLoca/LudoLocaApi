@@ -21,14 +21,15 @@ public class MetaController : ControllerBase
         Description = "Retorna os valores do enum RentalStatus com nomes traduzidos (Display).")]
     public IActionResult GetRentalStatuses()
     {
-        var values = Enum.GetValues<RentalStatus>()
-            .Cast<RentalStatus>()
-            .Select(status => new
-            {
-                Id = (int)status,
-                Name = status.GetDisplayName()
-            });
+        // var values = Enum.GetValues<RentalStatus>()
+        //     .Cast<RentalStatus>()
+        //     .Select(status => new
+        //     {
+        //         Id = (int)status,
+        //         Name = status.GetDisplayName()
+        //     });
 
-        return Ok(values);
+        // return Ok(values);
+        return Ok();
     }
 }
