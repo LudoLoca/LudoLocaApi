@@ -1,0 +1,39 @@
+# Build results
+bin/
+obj/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Visual Studio cache/options
+.vs/
+
+# Rider cache
+.idea/
+
+# Logs
+*.log
+
+# Secrets
+secrets.json
+appsettings.Development.json
+
+# Dependency directories
+node_modules/
+wwwroot/lib/
+
+# Publish output
+publish/
+out/
+
+# Environment variables (if stored in file)
+.env
+
+# Azure Functions local settings
+local.settings.json
+
+# Docker
+docker-compose.override.yml
