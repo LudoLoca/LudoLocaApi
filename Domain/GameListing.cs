@@ -35,3 +35,6 @@ public class GameListing
     [NotMapped]
     public bool IsRentable => IsAvailable && PricePerDay > 0;
 }
+
+
+// oi
