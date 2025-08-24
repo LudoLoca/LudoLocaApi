@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
 using API.Models;
+using API.Data;
 
 namespace API.Controllers
 {
@@ -9,14 +11,38 @@ namespace API.Controllers
     [Route("api/[controller]")]
     public class GameController : ControllerBase
     {
-        // TODO: Add DbContext or service injection for game management
-        
-        // Game creation record
-        public record CreateGameRequest(string Title, string Description);
-        public record UpdateGameRequest(string? Title, string? Description);
+        private readonly AppDbContext _dbContext;
+
+        public GameController(AppDbContext context)
+        {
+            _dbContext = context;
+        }
+
+        // Contratos de requisição para criação e atualização de jogos
+        public record CreateGameRequest(
+            string Title, 
+            string Description, 
+            string Publisher, 
+            int YearPublished, 
+            int MinPlayers, 
+            int MaxPlayers, 
+            int PlayTimeMinutes,
+            string? Designer
+        );
+
+        public record UpdateGameRequest(
+            string? Title, 
+            string? Description, 
+            string? Publisher, 
+            int? YearPublished, 
+            int? MinPlayers, 
+            int? MaxPlayers, 
+            int? PlayTimeMinutes,
+            string? Designer
+        );
 
         /// <summary>
-        /// Creates a new game
+        /// Cria um novo jogo no sistema
         /// </summary>
         [HttpPost]
         public async Task<IActionResult> CreateGame([FromBody] CreateGameRequest req)
@@ -24,38 +50,50 @@ namespace API.Controllers
             if (string.IsNullOrWhiteSpace(req.Title))
                 return BadRequest(new { error = "Title is required." });
 
-            // TODO: Implement game creation logic
             var game = new Game
             {
                 Id = Guid.NewGuid(),
                 Title = req.Title,
                 Description = req.Description,
+                Publisher = req.Publisher,
+                YearPublished = req.YearPublished,
+                MinPlayers = req.MinPlayers,
+                MaxPlayers = req.MaxPlayers,
+                PlayTimeMinutes = req.PlayTimeMinutes,
+                Designer = req.Designer,
                 CreatedAt = DateTime.UtcNow
             };
 
-            // Simulate successful creation
+            _dbContext.Games.Add(game);
+            await _dbContext.SaveChangesAsync();
+
             return CreatedAtAction(nameof(GetGame), new { id = game.Id }, game);
         }
 
         /// <summary>
-        /// Gets all games
+        /// Retorna todos os jogos cadastrados, incluindo seus gêneros
         /// </summary>
         [HttpGet]
         public async Task<IActionResult> GetGames()
         {
-            // TODO: Implement games listing logic
-            var games = new List<Game>(); // Replace with actual data retrieval
+            var games = await _dbContext.Games
+                .Include(g => g.GenreGames)
+                    .ThenInclude(gg => gg.Genre)
+                .ToListAsync();
+            
             return Ok(games);
         }
 
         /// <summary>
-        /// Gets a specific game by ID
+        /// Busca um jogo específico pelo seu ID
         /// </summary>
         [HttpGet("{id}")]
         public async Task<IActionResult> GetGame(Guid id)
         {
-            // TODO: Implement single game retrieval logic
-            var game = new Game(); // Replace with actual data retrieval
+            var game = await _dbContext.Games
+                .Include(g => g.GenreGames)
+                    .ThenInclude(gg => gg.Genre)
+                .FirstOrDefaultAsync(g => g.Id == id);
             
             if (game == null)
                 return NotFound(new { error = "Game not found." });
@@ -64,48 +102,46 @@ namespace API.Controllers
         }
 
         /// <summary>
-        /// Updates a game
+        /// Atualiza os dados de um jogo existente
         /// </summary>
         [HttpPatch("{id}")]
         public async Task<IActionResult> UpdateGame(Guid id, [FromBody] UpdateGameRequest req)
         {
-            // TODO: Implement game update logic
-            var game = new Game(); // Replace with actual data retrieval
+            var game = await _dbContext.Games.FindAsync(id);
 
             if (game == null)
                 return NotFound(new { error = "Game not found." });
 
-            // Update only provided fields
+            // Atualiza apenas os campos fornecidos na requisição
             if (req.Title != null) game.Title = req.Title;
             if (req.Description != null) game.Description = req.Description;
+            if (req.Publisher != null) game.Publisher = req.Publisher;
+            if (req.YearPublished.HasValue) game.YearPublished = req.YearPublished.Value;
+            if (req.MinPlayers.HasValue) game.MinPlayers = req.MinPlayers.Value;
+            if (req.MaxPlayers.HasValue) game.MaxPlayers = req.MaxPlayers.Value;
+            if (req.PlayTimeMinutes.HasValue) game.PlayTimeMinutes = req.PlayTimeMinutes.Value;
+            if (req.Designer != null) game.Designer = req.Designer;
+
+            await _dbContext.SaveChangesAsync();
 
             return Ok(game);
         }
 
         /// <summary>
-        /// Deletes a game
+        /// Remove um jogo do sistema
         /// </summary>
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteGame(Guid id)
         {
-            // TODO: Implement game deletion logic
-            var game = new Game(); // Replace with actual data retrieval
+            var game = await _dbContext.Games.FindAsync(id);
 
             if (game == null)
                 return NotFound(new { error = "Game not found." });
 
-            // Delete the game
+            _dbContext.Games.Remove(game);
+            await _dbContext.SaveChangesAsync();
+
             return NoContent();
         }
-    }
-
-    // Temporary Game model (should be moved to Models folder)
-    public class Game
-    {
-        public Guid Id { get; set; }
-        public string Title { get; set; } = string.Empty;
-        public string Description { get; set; } = string.Empty;
-        public DateTime CreatedAt { get; set; }
-        public DateTime? UpdatedAt { get; set; }
     }
 }
