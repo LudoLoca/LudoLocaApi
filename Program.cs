@@ -88,7 +88,7 @@ using (var scope = app.Services.CreateScope())
     // Cria o primeiro usuário admin caso não existam usuários
     // TODO: Trocar a senha padrão após o primeiro login em produção
     string adminEmail = "admin@admin.com";
-    string adminPassword = "Admin123!"; 
+    string adminPassword = "Admin123!";
 
     if (!userManager.Users.Any())
     {
@@ -106,7 +106,7 @@ using (var scope = app.Services.CreateScope())
             await userManager.AddToRoleAsync(adminUser, "Admin");
         }
         // TODO: Adicionar logs ou tratamento de erro caso a criação falhe
-    }
+    }       
 }
 
 app.Run();
