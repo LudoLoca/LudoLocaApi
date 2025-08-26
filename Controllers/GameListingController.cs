@@ -48,7 +48,7 @@ namespace API.Controllers
 				return Unauthorized(new { error = "Usuário não autenticado." });
 
 			//Cria o anúncio
-			var entity = new GameListing
+			var gameListing = new GameListing
 			{
 				Id = Guid.NewGuid(),
 				GameId = req.GameId,
@@ -59,19 +59,19 @@ namespace API.Controllers
 				CreatedAt = DateTime.UtcNow
 			};
 
-			_db.GameListings.Add(entity);
+			_db.GameListings.Add(gameListing);
 			await _db.SaveChangesAsync();
 
 			//retorna informações básicas do anúncio criado
-			return CreatedAtAction(nameof(GetById), new { id = entity.Id }, new
+			return CreatedAtAction(nameof(GetById), new { id = gameListing.Id }, new
 			{
-				entity.Id,
-				entity.GameId,
-				entity.OwnerUserId,
-				entity.PricePerDay,
-				entity.IsAvailable,
-				entity.ConditionNotes,
-				entity.CreatedAt
+                gameListing.Id,
+                gameListing.GameId,
+                gameListing.OwnerUserId,
+                gameListing.PricePerDay,
+                gameListing.IsAvailable,
+                gameListing.ConditionNotes,
+                gameListing.CreatedAt
 			});
 		}
 		
