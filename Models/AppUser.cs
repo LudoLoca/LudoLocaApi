@@ -7,7 +7,7 @@ namespace API.Models
     public class AppUser : IdentityUser<Guid>
     {
         
-        public string Username { get; set; } = string.Empty; 
+        //public string Username { get; set; } = string.Empty; 
         public DateTime RegisteredAt { get; set; } 
         public bool IsActive { get; set; } = true;
 
