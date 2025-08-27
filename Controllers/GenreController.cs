@@ -7,13 +7,11 @@ using Microsoft.EntityFrameworkCore;
 using API.Data;
 using API.Models;
 
-
 namespace API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
     [Authorize(Roles = "Admin")]
-
     public class GenreController : ControllerBase
     {
         private readonly AppDbContext _dB;
@@ -42,10 +40,7 @@ namespace API.Controllers
             _dB.Genres.Add(genero);
             await _dB.SaveChangesAsync();
             return Ok(genero);
-
-
         }
-
 
         [HttpGet]
         public async Task<IActionResult> ListAll()
@@ -63,21 +58,17 @@ namespace API.Controllers
             return Ok(itens);
         }
 
-        [HttpPatch("{name}")]
-        public async Task<IActionResult> Patch(string name, [FromBody] CreateGenre genre)
+        [HttpPatch("{id:guid}")]
+        public async Task<IActionResult> Patch(Guid id, [FromBody] CreateGenre genre)
         {
             if (string.IsNullOrWhiteSpace(genre.Name))
                 return BadRequest(new { error = "O campo 'Name' é obrigatório." });
 
-
-            var genero = await _dB.Genres
-                .FirstOrDefaultAsync(g => g.Name.ToLower() == name.ToLower());
-
+            var genero = await _dB.Genres.FindAsync(id);
             if (genero is null)
                 return NotFound(new { error = "Gênero não encontrado." });
 
-
-            var exists = await _dB.Genres.AnyAsync(g => g.Name.ToLower() == genre.Name.ToLower() && g.Id != genero.Id);
+            var exists = await _dB.Genres.AnyAsync(g => g.Name.ToLower() == genre.Name.ToLower() && g.Id != id);
             if (exists)
                 return Conflict(new { error = "Já existe um gênero com esse nome." });
 
@@ -87,17 +78,10 @@ namespace API.Controllers
             return Ok(genero);
         }
 
-
-        [HttpDelete("{name}")]
-        public async Task<IActionResult> Delete(string name)
+        [HttpDelete("{id:guid}")]
+        public async Task<IActionResult> Delete(Guid id)
         {
-            if (string.IsNullOrWhiteSpace(name))
-                return BadRequest(new { error = "O nome é obrigatório." });
-
-
-            var genero = await _dB.Genres
-                .FirstOrDefaultAsync(g => g.Name.ToLower() == name.ToLower());
-
+            var genero = await _dB.Genres.FindAsync(id);
             if (genero is null)
                 return NotFound(new { error = "Gênero não encontrado." });
 
@@ -106,12 +90,5 @@ namespace API.Controllers
 
             return NoContent();
         }
-
-
-
     }
-
-
-
-
 }
