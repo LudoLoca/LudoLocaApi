@@ -41,9 +41,6 @@ namespace API.Controllers
             string? Designer
         );
 
-        /// <summary>
-        /// Cria um novo jogo no sistema
-        /// </summary>
         [HttpPost]
         public async Task<IActionResult> CreateGame([FromBody] CreateGameRequest req)
         {
@@ -70,40 +67,67 @@ namespace API.Controllers
             return CreatedAtAction(nameof(GetGame), new { id = game.Id }, game);
         }
 
-        /// <summary>
-        /// Retorna todos os jogos cadastrados, incluindo seus gêneros
-        /// </summary>
         [HttpGet]
         public async Task<IActionResult> GetGames()
         {
             var games = await _dbContext.Games
                 .Include(g => g.GenreGames)
                     .ThenInclude(gg => gg.Genre)
+                .Select(g => new
+                {
+                    g.Id,
+                    g.Title,
+                    g.Description,
+                    g.Publisher,
+                    g.YearPublished,
+                    g.MinPlayers,
+                    g.MaxPlayers,
+                    g.PlayTimeMinutes,
+                    g.Designer,
+                    g.CreatedAt,
+                    Genres = g.GenreGames.Select(gg => new
+                    {
+                        gg.GenreId,
+                        gg.Genre.Name
+                    })
+                })
                 .ToListAsync();
-            
             return Ok(games);
         }
 
-        /// <summary>
-        /// Busca um jogo específico pelo seu ID
-        /// </summary>
         [HttpGet("{id}")]
         public async Task<IActionResult> GetGame(Guid id)
         {
             var game = await _dbContext.Games
                 .Include(g => g.GenreGames)
                     .ThenInclude(gg => gg.Genre)
-                .FirstOrDefaultAsync(g => g.Id == id);
-            
+                .Where(g => g.Id == id)
+                .Select(g => new
+                {
+                    g.Id,
+                    g.Title,
+                    g.Description,
+                    g.Publisher,
+                    g.YearPublished,
+                    g.MinPlayers,
+                    g.MaxPlayers,
+                    g.PlayTimeMinutes,
+                    g.Designer,
+                    g.CreatedAt,
+                    Genres = g.GenreGames.Select(gg => new
+                    {
+                        gg.GenreId,
+                        gg.Genre.Name
+                    })
+                })
+                .FirstOrDefaultAsync();
+
             if (game == null)
                 return NotFound(new { error = "Game not found." });
 
             return Ok(game);
         }
 
-        /// <summary>
-        /// Atualiza os dados de um jogo existente
-        /// </summary>
         [HttpPatch("{id}")]
         public async Task<IActionResult> UpdateGame(Guid id, [FromBody] UpdateGameRequest req)
         {
@@ -127,9 +151,6 @@ namespace API.Controllers
             return Ok(game);
         }
 
-        /// <summary>
-        /// Remove um jogo do sistema
-        /// </summary>
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteGame(Guid id)
         {
