@@ -42,9 +42,27 @@ namespace API.Controllers
             return Ok(genero);
         }
 
-        [HttpGet]
-        public async Task<IActionResult> ListAll()
+        [HttpGet("{id?}")]
+        public async Task<IActionResult> ListAll(Guid? id)
         {
+            if (id.HasValue)
+            {
+                var genre = await _dB.Genres
+                    .AsNoTracking()
+                    .Where(g => g.Id == id.Value)
+                    .Select(g => new
+                    {
+                        g.Id,
+                        g.Name
+                    })
+                    .FirstOrDefaultAsync();
+
+                if (genre == null)
+                    return NotFound();
+
+                return Ok(genre);
+            }
+
             var itens = await _dB.Genres
                 .AsNoTracking()
                 .OrderBy(g => g.Name)
@@ -57,6 +75,7 @@ namespace API.Controllers
 
             return Ok(itens);
         }
+
 
         [HttpPatch("{id:guid}")]
         public async Task<IActionResult> Patch(Guid id, [FromBody] CreateGenre genre)
