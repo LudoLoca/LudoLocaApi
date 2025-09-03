@@ -42,8 +42,9 @@ namespace API.Controllers
             return Ok(genero);
         }
 
+        // GET: api/Genre
         [HttpGet]
-        public async Task<IActionResult> ListAll()
+        public async Task<IActionResult> GetAll()
         {
             var itens = await _dB.Genres
                 .AsNoTracking()
@@ -57,6 +58,28 @@ namespace API.Controllers
 
             return Ok(itens);
         }
+
+        // GET: api/Genre/{id}
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(Guid id)
+        {
+            var genre = await _dB.Genres
+                .AsNoTracking()
+                .Where(g => g.Id == id)
+                .Select(g => new
+                {
+                    g.Id,
+                    g.Name
+                })
+                .FirstOrDefaultAsync();
+
+            if (genre == null)
+                return NotFound();
+
+            return Ok(genre);
+        }
+
+
 
         [HttpPatch("{id:guid}")]
         public async Task<IActionResult> Patch(Guid id, [FromBody] CreateGenre genre)
