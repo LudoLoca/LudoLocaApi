@@ -75,10 +75,8 @@ namespace API.Controllers
                 .Include(gg => gg.Genre)
                 .Select(gg => new
                 {
-                    gg.GameId,
-                    gg.Game.Title,
-                    gg.GenreId,
-                    gg.Genre.Name
+                    Id = gg.Genre.Id,      
+                    Name = gg.Genre.Name   
                 })
                 .ToListAsync();
 
