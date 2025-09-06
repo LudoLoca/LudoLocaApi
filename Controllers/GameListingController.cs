@@ -26,28 +26,28 @@ namespace API.Controllers
 		public record CreateGameListingRequest(Guid GameId, string? ConditionNotes, string PricePerDay,	bool? IsAvailable);
 		public record PatchGameListingRequest(string? PricePerDay, bool? IsAvailable, string? ConditionNotes);
 
-		//Criação de jogo ([POST] /GameListing)
+		//Criaï¿½ï¿½o de jogo ([POST] /GameListing)
 		[HttpPost]
 		public async Task<IActionResult> Create([FromBody] CreateGameListingRequest req)
 		{
 			//Valida se o GameId e PricePerDay foram fornecidos
 			if (req.GameId == Guid.Empty)
-				return BadRequest(new { error = "GameId é obrigatório." });
+				return BadRequest(new { error = "GameId ï¿½ obrigatï¿½rio." });
 
 			if (string.IsNullOrWhiteSpace(req.PricePerDay))
-				return BadRequest(new { error = "PricePerDay é obrigatório." });
+				return BadRequest(new { error = "PricePerDay ï¿½ obrigatï¿½rio." });
 
 			//Verifica se o jogo existe
 			var gameExists = await _db.Games.AnyAsync(g => g.Id == req.GameId);
 			if (!gameExists)
-				return NotFound(new { error = "Jogo não encontrado." });
+				return NotFound(new { error = "Jogo nï¿½o encontrado." });
 
-			//Pega o usuário autenticado
+			//Pega o usuï¿½rio autenticado
 			var user = await _userManager.GetUserAsync(User);
 			if (user == null)
-				return Unauthorized(new { error = "Usuário não autenticado." });
+				return Unauthorized(new { error = "Usuï¿½rio nï¿½o autenticado." });
 
-			//Cria o anúncio
+			//Cria o anï¿½ncio
 			var gameListing = new GameListing
 			{
 				Id = Guid.NewGuid(),
@@ -62,7 +62,7 @@ namespace API.Controllers
 			_db.GameListings.Add(gameListing);
 			await _db.SaveChangesAsync();
 
-			//retorna informações básicas do anúncio criado
+			//retorna informaï¿½ï¿½es bï¿½sicas do anï¿½ncio criado
 			return CreatedAtAction(nameof(GetById), new { id = gameListing.Id }, new
 			{
                 gameListing.Id,
@@ -88,14 +88,20 @@ namespace API.Controllers
 				.Select(gl => new
 				{
 					gl.Id,
-					gl.GameId,
-					GameTitle = gl.Game.Title,
-					gl.OwnerUserId,
-					OwnerName = gl.OwnerUser.UserName,
 					gl.PricePerDay,
 					gl.IsAvailable,
 					gl.ConditionNotes,
-					gl.CreatedAt
+					gl.CreatedAt,
+					Game = new
+					{
+						gl.Game.Id,
+						gl.Game.Title
+					},
+					OwnerUser = new
+					{
+						gl.OwnerUser.Id,
+						gl.OwnerUser.Email
+					}
 				})
 				.ToListAsync();
 
@@ -114,7 +120,7 @@ namespace API.Controllers
 				.FirstOrDefaultAsync(gl => gl.Id == id);
 
 			if (listing == null) 
-				return NotFound(new { error = "Anúncio não encontrado." });
+				return NotFound(new { error = "Anï¿½ncio nï¿½o encontrado." });
 
 
 			return Ok(new
@@ -135,11 +141,11 @@ namespace API.Controllers
 		public async Task<IActionResult> Patch(Guid id, [FromBody] PatchGameListingRequest req)
 		{
 			if (id == Guid.Empty)
-				return BadRequest(new { error = "Id inválido." });
+				return BadRequest(new { error = "Id invï¿½lido." });
 
 			var listing = await _db.GameListings.FindAsync(id);
 			if (listing == null)
-				return NotFound(new { error = "Anúncio não encontrado." });
+				return NotFound(new { error = "Anï¿½ncio nï¿½o encontrado." });
 
 			var user = await _userManager.GetUserAsync(User);
 			if (user == null)
@@ -177,11 +183,11 @@ namespace API.Controllers
 		public async Task<IActionResult> Delete(Guid id)
 		{
 			if (id == Guid.Empty)
-				return BadRequest(new { error = "Id inválido." });
+				return BadRequest(new { error = "Id invï¿½lido." });
 
 			var listing = await _db.GameListings.FindAsync(id);
 			if (listing == null)
-				return NotFound(new { error = "Anúncio não encontrado." });
+				return NotFound(new { error = "Anï¿½ncio nï¿½o encontrado." });
 
 			var user = await _userManager.GetUserAsync(User);
 			if (user == null)
