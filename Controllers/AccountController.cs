@@ -44,6 +44,7 @@ namespace API.Controllers
             var user = new AppUser
             {
                 UserName = req.Email,
+                Username = req.Email,
                 Email = req.Email,
                 EmailConfirmed = true,
                 RegisteredAt = DateTime.UtcNow
