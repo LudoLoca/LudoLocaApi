@@ -85,10 +85,7 @@ using (var scope = app.Services.CreateScope())
             await roleManager.CreateAsync(new IdentityRole<Guid>(role));
     }
 
-    // Cria o primeiro usuário admin caso não existam usuários
-    // TODO: Trocar a senha padrão após o primeiro login em produção
-    string adminEmail = "admin@admin.com";
-    string adminPassword = "Admin123!";
+
 
     if (!userManager.Users.Any())
     {
