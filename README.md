@@ -3,7 +3,7 @@
 
 # Guia de Configuração e Versionamento - LudoLoca
 
----
+----
 
 ## 1 Clonagem: Quando Usar o Meta Repo?
 <details>
