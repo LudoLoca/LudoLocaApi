@@ -45,7 +45,7 @@ builder.Services.AddCors(o =>
     o.AddPolicy(ClientCors, p =>
         p
             // TODO: Atualizar para a URL do Web App do front quando estiver disponível na Azure
-            .WithOrigins("https://localhost:7156")
+            .WithOrigins("https://ludolocaclient-f5b6bjdbfhdbgqcp.brazilsouth-01.azurewebsites.net")
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials());
